@@ -22,6 +22,9 @@ namespace CookingPrototype.Kitchen {
 		[UsedImplicitly]
 		public void TryTrashFood() {
 
+			//По двойному тапу не получилось, возможно из-за того, что я имел не осторожность работать в 2021 версии,
+			//где, со слов гугла, выпилили эмуляцию тапа мышкокликом.
+
 			var food = _place.CurFood;
 			if ( !_place.IsFree && food.CurStatus == Food.FoodStatus.Overcooked) {
 				_place.FreePlace();

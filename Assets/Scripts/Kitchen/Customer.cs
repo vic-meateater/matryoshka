@@ -22,7 +22,6 @@ namespace CookingPrototype.Kitchen {
 
 		public float WaitTime {
 			get { return CustomersController.Instance.CustomerWaitTime - _timer; }
-			set { }
 		}
 
 		/// <summary>

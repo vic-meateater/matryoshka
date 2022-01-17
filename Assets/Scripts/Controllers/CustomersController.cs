@@ -116,6 +116,7 @@ namespace CookingPrototype.Controllers {
 			TotalCustomersGeneratedChanged?.Invoke();
 			 
 			GameplayController.Instance.OrdersTarget = totalOrders - 2;
+			GameplayController.Instance.StartGame();
 		}
 
 		/// <summary>
@@ -170,26 +171,19 @@ namespace CookingPrototype.Controllers {
 			}
 
 			var currentCustumer = customersWithOrders[minWaitTime].CurCustomer;
-			//releaseCustumer
-			//CustomerWaitTime += 238;
-			//releaseCustumer.CurCustomer.WaitTime = minWaitTime + 18f;
-
-
-			//var orderIndex = currentCustumer.OrderPlaces.FindIndex(0,currentCustumer.OrderPlaces.Count,o=>o.CurOrder is not null && o.CurOrder.Name == order.Name);
 			var orderIndex = currentCustumer.OrderPlaces.FindIndex(o=>o.CurOrder is not null && o.CurOrder.Name == order.Name);
 
-			currentCustumer.OrderPlaces[orderIndex].CurOrder = null;
+			//currentCustumer.OrderPlaces[orderIndex].CurOrder = null;
+			currentCustumer.OrderPlaces[orderIndex].Complete();
+			
 			var nulledOrders = currentCustumer.OrderPlaces.FindAll(o => o.CurOrder == null);
 			if ( nulledOrders.Count != currentCustumer.OrderPlaces.Count ) {
+				
 				return true;
 			}
-
+			
 			FreeCustomer(currentCustumer);
 			return true;
-
-			//TODO: сделать проверку словаря Если нет бургеров в заказе, а на плите есть (157 строка) null не обрабатывает
-			//TODO: сделать прибавление таймера
-			//TODO: по возможности вернуть set'ы как было
 		}
 	}
 }

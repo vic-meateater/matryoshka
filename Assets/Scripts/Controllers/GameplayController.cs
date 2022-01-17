@@ -14,6 +14,7 @@ namespace CookingPrototype.Controllers {
 		public GameObject TapBlock   = null;
 		public WinWindow  WinWindow  = null;
 		public LoseWindow LoseWindow = null;
+		public StartWindow StartWindow = null;
 
 
 		int _ordersTarget = 0;
@@ -54,7 +55,15 @@ namespace CookingPrototype.Controllers {
 				EndGame(TotalOrdersServed >= OrdersTarget);
 			}
 		}
+		public void StartGame() {
+			Time.timeScale = 0f;
+			StartWindow.Show();
+		}
 
+		public void HideStartWindow() {
+			StartWindow?.Hide();
+			Time.timeScale = 1f;
+		}
 		void EndGame(bool win) {
 			Time.timeScale = 0f;
 			TapBlock?.SetActive(true);
