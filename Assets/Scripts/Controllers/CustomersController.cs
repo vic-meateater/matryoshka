@@ -139,7 +139,57 @@ namespace CookingPrototype.Controllers {
 		/// <param name="order">Заказ, который пытаемся отдать</param>
 		/// <returns>Флаг - результат, удалось ли успешно отдать заказ</returns>
 		public bool ServeOrder(Order order) {
-			throw  new NotImplementedException("ServeOrder: this feature is not implemented.");
+			var customersWithOrders = new Dictionary<float, CustomerPlace>();
+
+		/// <summary>
+		///  Ищем покупателей с тапнутым заказом на выдачу,
+		///  составляем словарь из времени и покупателя для последюущей выборки по наименьшему времени.
+		/// </summary>
+			foreach ( var custumerPlace in CustomerPlaces ) {
+				if ( custumerPlace.CurCustomer != null ) {
+					var findingOrders = custumerPlace.CurCustomer.OrderPlaces.FindAll(x => x.CurOrder != null).Find(x => x.CurOrder.Name == order.Name);
+
+					if ( findingOrders) {
+						var waitTime = custumerPlace.CurCustomer.WaitTime;
+						customersWithOrders.Add(waitTime, custumerPlace);
+					}
+				}
+			}
+			
+			if ( customersWithOrders.Count == 0 ) return false; //Тапнутого заказа нет в списке.
+
+		/// <summary>
+		///  Ищем покупателя с наименьшим временем до выдачи заказа
+		///  Магическое число 19 - время >18 секунд (максимальный таймер ожидания)
+		/// </summary>
+			var minWaitTime = 19f;
+			foreach (var customerWithOrder in customersWithOrders ) {
+				if ( minWaitTime > customerWithOrder.Key ) {
+					minWaitTime = customerWithOrder.Key;
+				}
+			}
+
+			var currentCustumer = customersWithOrders[minWaitTime].CurCustomer;
+			//releaseCustumer
+			//CustomerWaitTime += 238;
+			//releaseCustumer.CurCustomer.WaitTime = minWaitTime + 18f;
+
+
+			//var orderIndex = currentCustumer.OrderPlaces.FindIndex(0,currentCustumer.OrderPlaces.Count,o=>o.CurOrder is not null && o.CurOrder.Name == order.Name);
+			var orderIndex = currentCustumer.OrderPlaces.FindIndex(o=>o.CurOrder is not null && o.CurOrder.Name == order.Name);
+
+			currentCustumer.OrderPlaces[orderIndex].CurOrder = null;
+			var nulledOrders = currentCustumer.OrderPlaces.FindAll(o => o.CurOrder == null);
+			if ( nulledOrders.Count != currentCustumer.OrderPlaces.Count ) {
+				return true;
+			}
+
+			FreeCustomer(currentCustumer);
+			return true;
+
+			//TODO: сделать проверку словаря Если нет бургеров в заказе, а на плите есть (157 строка) null не обрабатывает
+			//TODO: сделать прибавление таймера
+			//TODO: по возможности вернуть set'ы как было
 		}
 	}
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CookingPrototype.Kitchen {
 	public sealed class CustomerOrderPlace : MonoBehaviour {
-		public Order CurOrder { get; private set; } = null;
+		public Order CurOrder { get; set; } = null;
 
 		public bool IsActive { get { return CurOrder != null; } }
 
