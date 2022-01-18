@@ -159,9 +159,9 @@ namespace CookingPrototype.Controllers {
 			
 			if ( customersWithOrders.Count == 0 ) return false; //Тапнутого заказа нет в списке.
 			
-			var currentCustomer = customersWithOrders.OrderBy(o => o.Key).First().Value.CurCustomer;
-			var orderIndex = currentCustomer.OrderPlaces.FindIndex(o=>o?.CurOrder.Name == order.Name);
 
+			var currentCustomer = customersWithOrders.OrderBy(o => o.Key).First().Value.CurCustomer;
+			var orderIndex = currentCustomer.OrderPlaces.FindIndex(o=>o.CurOrder is not null && o.CurOrder.Name == order.Name);
 			//currentCustumer.OrderPlaces[orderIndex].CurOrder = null;
 			currentCustomer.OrderPlaces[orderIndex].Complete();
 			
