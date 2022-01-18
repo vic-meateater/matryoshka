@@ -142,47 +142,35 @@ namespace CookingPrototype.Controllers {
 		public bool ServeOrder(Order order) {
 			var customersWithOrders = new Dictionary<float, CustomerPlace>();
 
-		/// <summary>
-		///  Ищем покупателей с тапнутым заказом на выдачу,
-		///  составляем словарь из времени и покупателя для последюущей выборки по наименьшему времени.
-		/// </summary>
-			foreach ( var custumerPlace in CustomerPlaces ) {
-				if ( custumerPlace.CurCustomer != null ) {
-					var findingOrders = custumerPlace.CurCustomer.OrderPlaces.FindAll(x => x.CurOrder != null).Find(x => x.CurOrder.Name == order.Name);
+
+			//  Ищем покупателей с тапнутым заказом на выдачу,
+			//  составляем словарь из времени и покупателя для последюущей выборки по наименьшему времени.
+
+			foreach ( var customerPlace in CustomerPlaces ) {
+				if ( customerPlace.CurCustomer != null ) {
+					var findingOrders = customerPlace.CurCustomer.OrderPlaces.FindAll(x => x.CurOrder != null).Find(x => x.CurOrder.Name == order.Name);
 
 					if ( findingOrders) {
-						var waitTime = custumerPlace.CurCustomer.WaitTime;
-						customersWithOrders.Add(waitTime, custumerPlace);
+						var waitTime = customerPlace.CurCustomer.WaitTime;
+						customersWithOrders.Add(waitTime, customerPlace);
 					}
 				}
 			}
 			
 			if ( customersWithOrders.Count == 0 ) return false; //Тапнутого заказа нет в списке.
-
-		/// <summary>
-		///  Ищем покупателя с наименьшим временем до выдачи заказа
-		///  Магическое число 19 - время >18 секунд (максимальный таймер ожидания)
-		/// </summary>
-			var minWaitTime = 19f;
-			foreach (var customerWithOrder in customersWithOrders ) {
-				if ( minWaitTime > customerWithOrder.Key ) {
-					minWaitTime = customerWithOrder.Key;
-				}
-			}
-
-			var currentCustumer = customersWithOrders[minWaitTime].CurCustomer;
-			var orderIndex = currentCustumer.OrderPlaces.FindIndex(o=>o.CurOrder is not null && o.CurOrder.Name == order.Name);
+			
+			var currentCustomer = customersWithOrders.OrderBy(o => o.Key).First().Value.CurCustomer;
+			var orderIndex = currentCustomer.OrderPlaces.FindIndex(o=>o?.CurOrder.Name == order.Name);
 
 			//currentCustumer.OrderPlaces[orderIndex].CurOrder = null;
-			currentCustumer.OrderPlaces[orderIndex].Complete();
+			currentCustomer.OrderPlaces[orderIndex].Complete();
 			
-			var nulledOrders = currentCustumer.OrderPlaces.FindAll(o => o.CurOrder == null);
-			if ( nulledOrders.Count != currentCustumer.OrderPlaces.Count ) {
-				
+			var nullOrders = currentCustomer.OrderPlaces.FindAll(o => o.CurOrder == null);
+			if ( nullOrders.Count != currentCustomer.OrderPlaces.Count ) {
 				return true;
 			}
 			
-			FreeCustomer(currentCustumer);
+			FreeCustomer(currentCustomer);
 			return true;
 		}
 	}
